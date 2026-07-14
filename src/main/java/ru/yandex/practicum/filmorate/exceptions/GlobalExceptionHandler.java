@@ -33,4 +33,10 @@ public class GlobalExceptionHandler {
 
         return new ErrorResponse(message);
     }
+
+    @ExceptionHandler(Throwable.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleThrowable(Throwable e) {
+        return new ErrorResponse("Произошла внутренняя ошибка сервера");
+    }
 }
