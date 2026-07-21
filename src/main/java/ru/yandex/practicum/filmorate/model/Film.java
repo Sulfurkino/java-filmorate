@@ -10,6 +10,8 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.annotation.ReleaseDateValidation;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder
@@ -29,4 +31,6 @@ public class Film {
     @NotNull
     @Positive
     private int duration;
+
+    private Set<Long> likes = new HashSet<>();
 }
