@@ -18,6 +18,8 @@ import java.util.Set;
 public class Film {
     private Long id;
 
+    private Set<Long> likes = new HashSet<>();
+
     @NotBlank
     private String name;
 
@@ -31,6 +33,4 @@ public class Film {
     @NotNull
     @Positive
     private int duration;
-
-    private Set<Long> likes = new HashSet<>();
 }

@@ -1,59 +1,81 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.el.stream.Optional;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.Comparator;
 import java.util.List;
 
-@Slf4j
 @Service
+@Slf4j
 public class FilmService {
-    private final FilmStorage filmStorage;
-    private final UserService userService;
 
-    public FilmService(FilmStorage filmStorage, UserService userService) {
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
+
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
-        this.userService = userService;
+        this.userStorage = userStorage;
     }
 
     public Film create(Film film) {
-        Film newFilm = filmStorage.create(film);
-        log.info("Добавлен фильм с id={}", newFilm.getId());
-        return newFilm;
+        return filmStorage.create(film);
     }
 
-    public Film validateFilmId(Long id){
-        return filmStorage.findById(id).orElseThrow(() -> {
-            log.error("Фильм с таким id - " + id + " не найден.");
-            throw new EntityNotFoundException(
-                    "Фильм с id=" + id + " не найден"
-            );
-        });
-    }
-
-    public Film update(Film film){
+    public Film update(Film film) {
         validateFilmId(film.getId());
-
-        Film updateFilm = filmStorage.update(film);
-        log.info("Обновлен фильм с id={}", film.getId());
-
-        return updateFilm;
+        return filmStorage.update(film);
     }
 
-    public List<Film> getAll(){
+    public List<Film> getAll() {
         return filmStorage.getAll();
     }
 
-    public boolean addLike(Long filmId, Long userId) {
-        Film film =  validateFilmId(filmId);
-        userService.validateUserId(userId);
-       return film.getLikes().add(userId);
+    public Film validateFilmId(Long id) {
+        return filmStorage.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Фильм с id=" + id + " не найден"));
     }
 
+    public boolean addLike(Long filmId, Long userId) {
+        Film film = validateFilmId(filmId);
+        validateUserId(userId);
 
+        boolean result = film.getLikes().add(userId);
 
+        filmStorage.update(film);
+
+        return result;
+    }
+
+    public boolean removeLike(Long filmId, Long userId) {
+        Film film = validateFilmId(filmId);
+        validateUserId(userId);
+
+        boolean result = film.getLikes().remove(userId);
+
+        filmStorage.update(film);
+
+        return result;
+    }
+
+    public List<Film> getPopular(int count) {
+        return filmStorage.getAll().stream()
+                .sorted(Comparator.comparingInt(
+                                (Film film) -> film.getLikes().size())
+                        .reversed())
+                .limit(count)
+                .toList();
+    }
+
+    private User validateUserId(Long id) {
+        return userStorage.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Пользователь с id=" + id + " не найден"));
+    }
 }

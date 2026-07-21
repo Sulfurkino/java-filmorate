@@ -6,15 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-
 
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/films")
-
+@Slf4j
 public class FilmController {
 
     private final FilmService filmService;
@@ -25,7 +22,7 @@ public class FilmController {
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-     return filmService.create(film);
+        return filmService.create(film);
     }
 
     @PutMapping
@@ -38,8 +35,26 @@ public class FilmController {
         return filmService.getAll();
     }
 
+    @GetMapping("/{id}")
+    public Film getById(@PathVariable Long id) {
+        return filmService.validateFilmId(id);
+    }
+
     @PutMapping("/{id}/like/{userId}")
-    public boolean addLike(@PathVariable(value = "id") Long filmId,@PathVariable(value = "userId") Long userId){
-        return filmService.addLike(filmId,userId);
+    public boolean addLike(@PathVariable Long id,
+                           @PathVariable Long userId) {
+        return filmService.addLike(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public boolean removeLike(@PathVariable Long id,
+                              @PathVariable Long userId) {
+        return filmService.removeLike(id, userId);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getPopular(
+            @RequestParam(defaultValue = "10") int count) {
+        return filmService.getPopular(count);
     }
 }
