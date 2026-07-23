@@ -9,14 +9,13 @@ import java.util.*;
 
 @Slf4j
 @Component
-
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
     private long nextId = 1;
-    
+
     @Override
     public Optional<User> findById(Long id) {
-        if (users.containsKey(id)){
+        if (users.containsKey(id)) {
             return Optional.of(users.get(id));
         }
         return Optional.empty();
