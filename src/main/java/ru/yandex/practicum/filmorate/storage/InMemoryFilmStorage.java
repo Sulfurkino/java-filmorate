@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.*;
@@ -43,8 +42,4 @@ public class InMemoryFilmStorage implements FilmStorage {
    public List<Film> getAll() {
       return new ArrayList<>(films.values());
    }
-
-
-
-
 }
