@@ -13,10 +13,9 @@ import java.util.Set;
 @Data
 @Builder
 public class User {
-
-    private Long id;
-
+    @Builder.Default
     private Set<Long> friends = new HashSet<>();
+    private Long id;
 
     @NotBlank(message = "Email не может быть пустым")
     @Email(message = "Некорректный email")
