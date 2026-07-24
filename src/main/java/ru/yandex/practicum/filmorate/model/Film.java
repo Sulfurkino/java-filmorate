@@ -5,8 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import ru.yandex.practicum.filmorate.annotation.ReleaseDateValidation;
 
 import java.time.LocalDate;
@@ -15,12 +14,10 @@ import java.util.Set;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Film {
     private Long id;
-
-    @Builder.Default
-    private Set<Long> likes = new HashSet<>();
-
     @NotBlank
     private String name;
 
@@ -34,4 +31,8 @@ public class Film {
     @NotNull
     @Positive
     private int duration;
+
+    @Setter
+    private Set<Long> likes = new HashSet<>();
+
 }

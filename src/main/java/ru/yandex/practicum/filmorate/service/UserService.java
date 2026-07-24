@@ -45,9 +45,6 @@ public class UserService {
         boolean result = user.getFriends().add(friendId);
         friend.getFriends().add(id);
 
-        userStorage.update(user);
-        userStorage.update(friend);
-
         log.info("Пользователи {} и {} стали друзьями", id, friendId);
 
         return result;
@@ -59,9 +56,6 @@ public class UserService {
 
         boolean result = user.getFriends().remove(friendId);
         friend.getFriends().remove(id);
-
-        userStorage.update(user);
-        userStorage.update(friend);
 
         log.info("Пользователи {} и {} больше не друзья", id, friendId);
 
