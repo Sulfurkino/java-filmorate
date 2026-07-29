@@ -1,14 +1,11 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.*;
 
 @Slf4j
-@Component
-
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
     private long nextId = 1;
@@ -41,5 +38,24 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Film> getAll() {
         return new ArrayList<>(films.values());
+    }
+
+    @Override
+    public boolean addLike(Long filmId, Long userId) {
+        return films.get(filmId).getLikes().add(userId);
+    }
+
+    @Override
+    public boolean removeLike(Long filmId, Long userId) {
+        return films.get(filmId).getLikes().remove(userId);
+    }
+
+    @Override
+    public List<Film> getPopular(int count) {
+        return films.values().stream()
+                .sorted(Comparator.comparingInt((Film film) -> film.getLikes().size()).reversed()
+                        .thenComparing(Film::getId))
+                .limit(count)
+                .toList();
     }
 }

@@ -1,14 +1,12 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
 
 @Slf4j
-@Component
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
     private long nextId = 1;
@@ -56,5 +54,28 @@ public class InMemoryUserStorage implements UserStorage {
         log.info("Добавлен пользователь с id={}", user.getId());
 
         return user;
+    }
+
+    @Override
+    public boolean addFriend(Long id, Long friendId) {
+        return users.get(id).getFriends().add(friendId);
+    }
+
+    @Override
+    public boolean removeFriend(Long id, Long friendId) {
+        return users.get(id).getFriends().remove(friendId);
+    }
+
+    @Override
+    public List<User> getFriends(Long id) {
+        return users.get(id).getFriends().stream().map(users::get).toList();
+    }
+
+    @Override
+    public List<User> getCommonFriends(Long id, Long otherId) {
+        return users.get(id).getFriends().stream()
+                .filter(users.get(otherId).getFriends()::contains)
+                .map(users::get)
+                .toList();
     }
 }
