@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -62,6 +63,7 @@ class FilmorateApplicationTests {
 				.description("Description")
 				.releaseDate(LocalDate.of(1895, 12, 28))
 				.duration(120)
+				.mpa(Mpa.builder().id(1L).build())
 				.build();
 
 		Set<ConstraintViolation<Film>> errors = validator.validate(film);
@@ -92,6 +94,7 @@ class FilmorateApplicationTests {
 				.description(description)
 				.releaseDate(LocalDate.of(1895, 12, 28))
 				.duration(120)
+				.mpa(Mpa.builder().id(1L).build())
 				.build();
 
 		Set<ConstraintViolation<Film>> errors = validator.validate(film);
@@ -122,6 +125,7 @@ class FilmorateApplicationTests {
 				.description("Description")
 				.releaseDate(LocalDate.of(1895, 12, 28))
 				.duration(1)
+				.mpa(Mpa.builder().id(1L).build())
 				.build();
 
 		Set<ConstraintViolation<Film>> errors = validator.validate(film);
