@@ -4,11 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 @Service
@@ -17,18 +18,25 @@ public class FilmService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final GenreStorage genreStorage;
+    private final MpaStorage mpaStorage;
 
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage,
+                       GenreStorage genreStorage, MpaStorage mpaStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.genreStorage = genreStorage;
+        this.mpaStorage = mpaStorage;
     }
 
     public Film create(Film film) {
+        validateReferences(film);
         return filmStorage.create(film);
     }
 
     public Film update(Film film) {
         validateFilmId(film.getId());
+        validateReferences(film);
         return filmStorage.update(film);
     }
 
@@ -43,39 +51,38 @@ public class FilmService {
     }
 
     public boolean addLike(Long filmId, Long userId) {
-        Film film = validateFilmId(filmId);
+        validateFilmId(filmId);
         validateUserId(userId);
-
-        boolean result = film.getLikes().add(userId);
-
-        filmStorage.update(film);
-
-        return result;
+        return filmStorage.addLike(filmId, userId);
     }
 
     public boolean removeLike(Long filmId, Long userId) {
-        Film film = validateFilmId(filmId);
+        validateFilmId(filmId);
         validateUserId(userId);
-
-        boolean result = film.getLikes().remove(userId);
-
-        filmStorage.update(film);
-
-        return result;
+        return filmStorage.removeLike(filmId, userId);
     }
 
     public List<Film> getPopular(int count) {
-        return filmStorage.getAll().stream()
-                .sorted(Comparator.comparingInt(
-                                (Film film) -> film.getLikes().size())
-                        .reversed())
-                .limit(count)
-                .toList();
+        return filmStorage.getPopular(count);
     }
 
-    private User validateUserId(Long id) {
-        return userStorage.findById(id)
+    private void validateUserId(Long id) {
+        userStorage.findById(id)
                 .orElseThrow(() ->
                         new EntityNotFoundException("Пользователь с id=" + id + " не найден"));
+    }
+
+    private void validateReferences(Film film) {
+        if (film.getGenres() == null) {
+            film.setGenres(new LinkedHashSet<>());
+        }
+        Long mpaId = film.getMpa() == null ? null : film.getMpa().getId();
+        mpaStorage.findById(mpaId).orElseThrow(() ->
+                new EntityNotFoundException("Рейтинг MPA с id=" + mpaId + " не найден"));
+        film.getGenres().forEach(genre -> {
+            Long genreId = genre == null ? null : genre.getId();
+            genreStorage.findById(genreId).orElseThrow(() ->
+                    new EntityNotFoundException("Жанр с id=" + genreId + " не найден"));
+        });
     }
 }
