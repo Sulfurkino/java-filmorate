@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -21,6 +22,7 @@ public class User {
     private String email;
 
     @NotBlank(message = "Логин не может быть пустым")
+    @Pattern(regexp = "\\S+", message = "Логин не должен содержать пробелы")
     private String login;
 
     private String name;
@@ -29,5 +31,6 @@ public class User {
     private LocalDate birthday;
 
     @Setter
+    @Builder.Default
     private Set<Long> friends = new HashSet<>();
 }
